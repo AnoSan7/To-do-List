@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="src/style.css" />
+        <script defer src="./src/main.js"></script>
+        <title>To-do List</title>
+    </head>
+    <body class="bg-slate-900 text-white min-h-screen">
+        <div class="grid grid-cols-[1fr_5fr] gap-2">
+            <nav
+                class="border-r border-slate-700 min-h-screen pt-10 pl-10 flex flex-col gap-10"
+            >
+                <div class="flex flex-col gap-1" id="section-list">
+                    <button
+                        class="block p-2 bg-slate-800 rounded hover:bg-slate-700 cursor-pointer"
+                        id="all-tasks"
+                    >
+                        All
+                    </button>
+                </div>
+                <button
+                    id="section-button"
+                    class="bg-green-600 p-4 rounded-full cursor-pointer hover:bg-green-400 mr-2"
+                >
+                    Create new section
+                </button>
+                <button
+                    id="section-removal"
+                    class="bg-red-600 p-4 rounded-full cursor-pointer hover:bg-red-400 mr-2"
+                >
+                    Remove section
+                </button>
+            </nav>
+            <div>
+                <header
+                    class="p-5 border-b border-slate-700 flex justify-between items-center"
+                >
+                    <h1 class="text-3xl font-bold flex-2 text-center">
+                        Todo List
+                    </h1>
+                    <button
+                        id="task-button"
+                        class="bg-blue-600 p-4 rounded-full mt-2 cursor-pointer hover:bg-blue-400"
+                    >
+                        Add new task
+                    </button>
+                </header>
+                <div
+                    class="grid grid-cols-3 gap-4 p-10"
+                    id="task-container"
+                ></div>
+            </div>
+            <dialog id="dialog1">
+                <form
+                    method="dialog"
+                    class="p-5 flex flex-col gap-5"
+                    id="task-form"
+                >
+                    <h2 class="text-2xl font-bold">Create new task</h2>
+                    <input
+                        id="task-title"
+                        type="text"
+                        placeholder="Task title"
+                        class="p-2 rounded border border-slate-700"
+                    />
+                    <textarea
+                        id="task-description"
+                        placeholder="Task description"
+                        class="p-2 rounded border border-slate-700"
+                    ></textarea>
+                    <input
+                        id="task-due-date"
+                        type="date"
+                        class="p-2 rounded border border-slate-700"
+                    />
+                    <select
+                        id="task-priority"
+                        class="p-2 rounded border border-slate-700"
+                    >
+                        <option value="" disabled selected>
+                            Select priority
+                        </option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                    <div class="flex justify-end gap-2">
+                        <button
+                            type="submit"
+                            id="task-submit"
+                            class="bg-green-600 p-2 rounded cursor-pointer hover:bg-green-400"
+                        >
+                            Create
+                        </button>
+                        <button
+                            type="reset"
+                            id="task-cancel"
+                            class="bg-red-600 p-2 rounded cursor-pointer hover:bg-red-400"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="dialog2">
+                <form
+                    method="dialog"
+                    class="p-5 flex flex-col gap-5"
+                    id="section-form"
+                >
+                    <h2 class="text-2xl font-bold">Create new section</h2>
+                    <input
+                        id="section-name"
+                        type="text"
+                        placeholder="Section name"
+                        class="p-2 rounded border border-slate-700"
+                    />
+                    <div class="flex justify-end gap-2">
+                        <button
+                            type="submit"
+                            id="section-submit"
+                            class="bg-green-600 p-2 rounded cursor-pointer hover:bg-green-400"
+                        >
+                            Create
+                        </button>
+                        <button
+                            type="reset"
+                            id="section-cancel"
+                            class="bg-red-600 p-2 rounded cursor-pointer hover:bg-red-400"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </dialog>
+            <!-- <dialog id="dialog3"> -->
+        </div>
+    </body>
+</html>

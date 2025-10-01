@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@layer base {
+    dialog {
+        @apply m-auto;
+    }
+}
+
+@layer components {
+    .card {
+        @apply h-100 border-2 border-black flex flex-col gap-2 text-2xl rounded-2xl justify-between p-5;
+    }
+    .focused {
+        @apply border-4 border-blue-600;
+    }
+    .section {
+        @apply block p-2 bg-slate-800 rounded hover:bg-slate-700 cursor-pointer;
+    }
+}
