@@ -1,9 +1,8 @@
 const sectionButton = document.querySelector("#section-button");
-// const sectionRemoval=document.querySelector('#section-removal');
+const sectionRemoval = document.querySelector("#section-removal");
 const taskButton = document.querySelector("#task-button");
 const dialog1 = document.querySelector("#dialog1");
 const dialog2 = document.querySelector("#dialog2");
-// const dialog3=document.querySelector('#dialog3');
 const taskCancel = document.querySelector("#task-cancel");
 const sectionCancel = document.querySelector("#section-cancel");
 const taskContainer = document.querySelector("#task-container");
@@ -34,6 +33,34 @@ class Task {
 }
 
 let tasks = [];
+
+function renderTasks(sectionIndex = currSection) {
+    taskContainer.innerHTML = "";
+
+    tasks.forEach((task) => {
+        if (sectionIndex !== 0 && task.section !== sectionIndex) {
+            return;
+        }
+
+        const taskElement = document.createElement("div");
+        taskElement.classList.add("card");
+        taskElement.innerHTML = `
+            <h3 class="text-xl font-bold">${task.title}</h3>
+            <p>${task.description}</p>
+            <p>Due: ${task.dueDate}</p>
+        `;
+        taskElement.classList.add(priorityColor(task.priority));
+        taskContainer.appendChild(taskElement);
+    });
+}
+
+function setFocusedButton(button) {
+    if (document.querySelector(".focused")) {
+        document.querySelector(".focused").classList.remove("focused");
+    }
+
+    button.classList.add("focused");
+}
 
 sectionButton.addEventListener("click", () => {
     dialog2.showModal();
@@ -71,6 +98,28 @@ sectionSubmit.addEventListener("click", (e) => {
     sectionList.appendChild(sectionElement);
 });
 
+sectionRemoval.addEventListener("click", () => {
+    if (currSection === 0) {
+        return;
+    }
+
+    sections.splice(currSection, 1);
+    tasks = tasks
+        .filter((task) => task.section !== currSection)
+        .map((task) => {
+            if (task.section > currSection) {
+                return { ...task, section: task.section - 1 };
+            }
+
+            return task;
+        });
+
+    sectionList.children[currSection].remove();
+    currSection = 0;
+    setFocusedButton(allTasks);
+    renderTasks();
+});
+
 taskSubmit.addEventListener("click", (e) => {
     e.preventDefault();
     const title = document.querySelector("#task-title").value;
@@ -82,35 +131,13 @@ taskSubmit.addEventListener("click", (e) => {
     console.log(tasks);
     document.querySelector("#task-form").reset();
     dialog1.close();
-    const taskElement = document.createElement("div");
-    taskElement.classList.add("card");
-    taskElement.innerHTML = `
-        <h3 class="text-xl font-bold">${newTask.title}</h3>
-        <p>${newTask.description}</p>
-        <p>Due: ${newTask.dueDate}</p>
-    `;
-    taskElement.classList.add(priorityColor(newTask.priority));
-    taskContainer.appendChild(taskElement);
+    renderTasks();
 });
 
 allTasks.addEventListener("click", () => {
-    if (document.querySelector(".focused")) {
-        document.querySelector(".focused").classList.remove("focused");
-    }
-    allTasks.classList.add("focused");
+    setFocusedButton(allTasks);
     currSection = 0;
-    taskContainer.innerHTML = "";
-    tasks.forEach((task) => {
-        const taskElement = document.createElement("div");
-        taskElement.classList.add("card");
-        taskElement.innerHTML = `
-            <h3 class="text-xl font-bold">${task.title}</h3>
-            <p>${task.description}</p>
-            <p>Due: ${task.dueDate}</p>
-        `;
-        taskElement.classList.add(priorityColor(task.priority));
-        taskContainer.appendChild(taskElement);
-    });
+    renderTasks();
 });
 
 function priorityColor(priority) {
@@ -125,27 +152,11 @@ function priorityColor(priority) {
 
 sectionList.addEventListener("click", (e) => {
     if (e.target.classList.contains("section")) {
-        if (document.querySelector(".focused")) {
-            document.querySelector(".focused").classList.remove("focused");
-        }
-        e.target.classList.add("focused");
+        setFocusedButton(e.target);
         const sectionName = e.target.textContent;
         currSection = sections.findIndex((section) => {
             return section.name === sectionName;
         });
-        taskContainer.innerHTML = "";
-        tasks.forEach((task) => {
-            if (task.section === currSection) {
-                const taskElement = document.createElement("div");
-                taskElement.classList.add("card");
-                taskElement.innerHTML = `
-                    <h3 class="text-xl font-bold">${task.title}</h3>
-                    <p>${task.description}</p>
-                    <p>Due: ${task.dueDate}</p>
-                `;
-                taskElement.classList.add(priorityColor(task.priority));
-                taskContainer.appendChild(taskElement);
-            }
-        });
+        renderTasks();
     }
 });
