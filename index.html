@@ -7,77 +7,98 @@
         <script type='module' src="/src/main.js"></script>
         <title>To-do List</title>
     </head>
-    <body class="bg-slate-900 text-white min-h-screen">
-        <div class="grid grid-cols-[1fr_5fr] gap-2">
-            <nav
-                class="border-r border-slate-700 min-h-screen pt-10 pl-10 flex flex-col gap-10"
-            >
-                <div class="flex flex-col gap-1" id="section-list">
-                    <button
-                        class="block p-2 bg-slate-800 rounded hover:bg-slate-700 cursor-pointer"
-                        id="all-tasks"
-                    >
+    <body class="app-body text-white min-h-screen">
+        <div class="app-shell">
+            <nav class="app-sidebar">
+                <div class="sidebar-copy">
+                    <p class="eyebrow">Workspace</p>
+                    <h2 class="sidebar-title">Sections</h2>
+                    <p class="sidebar-description">
+                        Organize your day into focused task groups.
+                    </p>
+                </div>
+                <div class="section-list" id="section-list">
+                    <button class="section-item focused" id="all-tasks">
                         All
                     </button>
                 </div>
+                <div class="sidebar-actions">
+                    <button
+                        id="section-button"
+                        class="action-button action-button--primary"
+                    >
+                        Create new section
+                    </button>
+                    <button
+                        id="section-removal"
+                        class="action-button action-button--danger"
+                    >
+                        Remove section
+                    </button>
+                </div>
                 <button
-                    id="section-button"
-                    class="bg-green-600 p-4 rounded-full cursor-pointer hover:bg-green-400 mr-2"
+                    id="sidebar-close"
+                    class="sidebar-close action-button action-button--accent"
                 >
-                    Create new section
-                </button>
-                <button
-                    id="section-removal"
-                    class="bg-red-600 p-4 rounded-full cursor-pointer hover:bg-red-400 mr-2"
-                >
-                    Remove section
+                    Close panel
                 </button>
             </nav>
-            <div>
-                <header
-                    class="p-5 border-b border-slate-700 flex justify-between items-center"
-                >
-                    <h1 class="text-3xl font-bold flex-2 text-center">
-                        Todo List
-                    </h1>
+            <button
+                id="sidebar-backdrop"
+                class="sidebar-backdrop"
+                aria-label="Close sections panel"
+                type="button"
+            ></button>
+            <div class="content-panel">
+                <header class="app-header">
+                    <div>
+                        <p class="eyebrow">Daily planning</p>
+                        <h1 class="app-title">Todo List</h1>
+                    </div>
+                    <button
+                        id="sidebar-toggle"
+                        class="sidebar-toggle"
+                        aria-expanded="false"
+                        aria-controls="section-list"
+                        aria-label="Open sections menu"
+                    >
+                        <span class="sidebar-toggle-icon" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
                     <button
                         id="task-button"
-                        class="bg-blue-600 p-4 rounded-full mt-2 cursor-pointer hover:bg-blue-400"
+                        class="action-button action-button--accent"
                     >
                         Add new task
                     </button>
                 </header>
-                <div
-                    class="grid grid-cols-3 gap-4 p-10"
-                    id="task-container"
-                ></div>
+                <div class="task-grid" id="task-container"></div>
             </div>
-            <dialog id="dialog1">
-                <form
-                    method="dialog"
-                    class="p-5 flex flex-col gap-5"
-                    id="task-form"
-                >
-                    <h2 class="text-2xl font-bold">Create new task</h2>
+            <dialog id="dialog1" class="dialog-surface">
+                <form method="dialog" class="dialog-form" id="task-form">
+                    <h2 class="dialog-title">Create new task</h2>
                     <input
                         id="task-title"
                         type="text"
                         placeholder="Task title"
-                        class="p-2 rounded border border-slate-700"
+                        class="field"
                     />
                     <textarea
                         id="task-description"
                         placeholder="Task description"
-                        class="p-2 rounded border border-slate-700"
+                        class="field field--textarea"
                     ></textarea>
                     <input
                         id="task-due-date"
                         type="date"
-                        class="p-2 rounded border border-slate-700"
+                        class="field"
                     />
                     <select
                         id="task-priority"
-                        class="p-2 rounded border border-slate-700"
+                        class="field"
                     >
                         <option value="" disabled selected>
                             Select priority
@@ -86,49 +107,45 @@
                         <option value="Medium">Medium</option>
                         <option value="High">High</option>
                     </select>
-                    <div class="flex justify-end gap-2">
+                    <div class="dialog-actions">
                         <button
                             type="submit"
                             id="task-submit"
-                            class="bg-green-600 p-2 rounded cursor-pointer hover:bg-green-400"
+                            class="action-button action-button--primary"
                         >
                             Create
                         </button>
                         <button
                             type="reset"
                             id="task-cancel"
-                            class="bg-red-600 p-2 rounded cursor-pointer hover:bg-red-400"
+                            class="action-button action-button--danger"
                         >
                             Cancel
                         </button>
                     </div>
                 </form>
             </dialog>
-            <dialog id="dialog2">
-                <form
-                    method="dialog"
-                    class="p-5 flex flex-col gap-5"
-                    id="section-form"
-                >
-                    <h2 class="text-2xl font-bold">Create new section</h2>
+            <dialog id="dialog2" class="dialog-surface">
+                <form method="dialog" class="dialog-form" id="section-form">
+                    <h2 class="dialog-title">Create new section</h2>
                     <input
                         id="section-name"
                         type="text"
                         placeholder="Section name"
-                        class="p-2 rounded border border-slate-700"
+                        class="field"
                     />
-                    <div class="flex justify-end gap-2">
+                    <div class="dialog-actions">
                         <button
                             type="submit"
                             id="section-submit"
-                            class="bg-green-600 p-2 rounded cursor-pointer hover:bg-green-400"
+                            class="action-button action-button--primary"
                         >
                             Create
                         </button>
                         <button
                             type="reset"
                             id="section-cancel"
-                            class="bg-red-600 p-2 rounded cursor-pointer hover:bg-red-400"
+                            class="action-button action-button--danger"
                         >
                             Cancel
                         </button>

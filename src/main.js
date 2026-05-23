@@ -1,6 +1,10 @@
 const sectionButton = document.querySelector("#section-button");
 const sectionRemoval = document.querySelector("#section-removal");
 const taskButton = document.querySelector("#task-button");
+const sidebarToggle = document.querySelector("#sidebar-toggle");
+const sidebarClose = document.querySelector("#sidebar-close");
+const sidebarBackdrop = document.querySelector("#sidebar-backdrop");
+const appShell = document.querySelector(".app-shell");
 const dialog1 = document.querySelector("#dialog1");
 const dialog2 = document.querySelector("#dialog2");
 const taskCancel = document.querySelector("#task-cancel");
@@ -34,6 +38,16 @@ class Task {
 
 let tasks = [];
 
+function openSidebar() {
+    appShell.classList.add("sidebar-open");
+    sidebarToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeSidebar() {
+    appShell.classList.remove("sidebar-open");
+    sidebarToggle.setAttribute("aria-expanded", "false");
+}
+
 function renderTasks(sectionIndex = currSection) {
     taskContainer.innerHTML = "";
 
@@ -66,6 +80,18 @@ sectionButton.addEventListener("click", () => {
     dialog2.showModal();
 });
 
+sidebarToggle.addEventListener("click", () => {
+    if (appShell.classList.contains("sidebar-open")) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+});
+
+sidebarClose.addEventListener("click", closeSidebar);
+
+sidebarBackdrop.addEventListener("click", closeSidebar);
+
 taskButton.addEventListener("click", () => {
     dialog1.showModal();
 });
@@ -82,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!allTasks.classList.contains("focused")) {
         allTasks.classList.add("focused");
     }
+
+    closeSidebar();
 });
 
 sectionSubmit.addEventListener("click", (e) => {
@@ -93,9 +121,10 @@ sectionSubmit.addEventListener("click", (e) => {
     document.querySelector("#section-form").reset();
     dialog2.close();
     const sectionElement = document.createElement("button");
-    sectionElement.classList.add("section");
+    sectionElement.classList.add("section-item", "section");
     sectionElement.textContent = sectionName;
     sectionList.appendChild(sectionElement);
+    closeSidebar();
 });
 
 sectionRemoval.addEventListener("click", () => {
@@ -118,6 +147,7 @@ sectionRemoval.addEventListener("click", () => {
     currSection = 0;
     setFocusedButton(allTasks);
     renderTasks();
+    closeSidebar();
 });
 
 taskSubmit.addEventListener("click", (e) => {
@@ -138,15 +168,16 @@ allTasks.addEventListener("click", () => {
     setFocusedButton(allTasks);
     currSection = 0;
     renderTasks();
+    closeSidebar();
 });
 
 function priorityColor(priority) {
     if (priority === "High") {
-        return "bg-red-500";
+        return "card--high";
     } else if (priority === "Medium") {
-        return "bg-yellow-500";
+        return "card--medium";
     } else {
-        return "bg-green-500";
+        return "card--low";
     }
 }
 
@@ -158,5 +189,6 @@ sectionList.addEventListener("click", (e) => {
             return section.name === sectionName;
         });
         renderTasks();
+        closeSidebar();
     }
 });
