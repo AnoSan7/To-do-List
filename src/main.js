@@ -14,6 +14,7 @@ const allTasks = document.querySelector("#all-tasks");
 const sectionSubmit = document.querySelector("#section-submit");
 const taskSubmit = document.querySelector("#task-submit");
 const sectionList = document.querySelector("#section-list");
+const STORAGE_KEY = "todo-list-state";
 
 class Section {
     constructor(name) {
@@ -37,6 +38,57 @@ class Task {
 }
 
 let tasks = [];
+
+function loadState() {
+    try {
+        const savedState = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+        if (!savedState) {
+            return;
+        }
+
+        sections = Array.isArray(savedState.sections) && savedState.sections.length
+            ? savedState.sections
+            : [new Section("All")];
+
+        if (sections[0]?.name !== "All") {
+            sections.unshift(new Section("All"));
+        }
+
+        tasks = Array.isArray(savedState.tasks) ? savedState.tasks : [];
+        currSection = Number.isInteger(savedState.currSection)
+            ? savedState.currSection
+            : 0;
+    } catch {
+        sections = [new Section("All")];
+        tasks = [];
+        currSection = 0;
+    }
+}
+
+function saveState() {
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+            sections,
+            tasks,
+            currSection,
+        }),
+    );
+}
+
+function renderSections() {
+    sectionList.querySelectorAll(".section").forEach((button) => {
+        button.remove();
+    });
+
+    sections.slice(1).forEach((section) => {
+        const sectionElement = document.createElement("button");
+        sectionElement.classList.add("section-item", "section");
+        sectionElement.textContent = section.name;
+        sectionList.appendChild(sectionElement);
+    });
+}
 
 function openSidebar() {
     appShell.classList.add("sidebar-open");
@@ -76,6 +128,24 @@ function setFocusedButton(button) {
     button.classList.add("focused");
 }
 
+function syncActiveSection() {
+    if (currSection === 0) {
+        setFocusedButton(allTasks);
+        return;
+    }
+
+    const sectionButtons = sectionList.querySelectorAll(".section");
+    const activeButton = sectionButtons[currSection - 1];
+
+    if (activeButton) {
+        setFocusedButton(activeButton);
+        return;
+    }
+
+    currSection = 0;
+    setFocusedButton(allTasks);
+}
+
 sectionButton.addEventListener("click", () => {
     dialog2.showModal();
 });
@@ -104,26 +174,22 @@ sectionCancel.addEventListener("click", () => {
     dialog2.close();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (!allTasks.classList.contains("focused")) {
-        allTasks.classList.add("focused");
-    }
-
-    closeSidebar();
-});
+loadState();
+renderSections();
+syncActiveSection();
+renderTasks();
+closeSidebar();
 
 sectionSubmit.addEventListener("click", (e) => {
     e.preventDefault();
     const sectionName = document.querySelector("#section-name").value;
     const newSection = new Section(sectionName);
     sections.push(newSection);
-    console.log(sections);
     document.querySelector("#section-form").reset();
     dialog2.close();
-    const sectionElement = document.createElement("button");
-    sectionElement.classList.add("section-item", "section");
-    sectionElement.textContent = sectionName;
-    sectionList.appendChild(sectionElement);
+    renderSections();
+    syncActiveSection();
+    saveState();
     closeSidebar();
 });
 
@@ -145,8 +211,10 @@ sectionRemoval.addEventListener("click", () => {
 
     sectionList.children[currSection].remove();
     currSection = 0;
-    setFocusedButton(allTasks);
+    renderSections();
+    syncActiveSection();
     renderTasks();
+    saveState();
     closeSidebar();
 });
 
@@ -158,16 +226,17 @@ taskSubmit.addEventListener("click", (e) => {
     const priority = document.querySelector("#task-priority").value;
     const newTask = new Task(title, description, dueDate, priority);
     tasks.push(newTask);
-    console.log(tasks);
     document.querySelector("#task-form").reset();
     dialog1.close();
     renderTasks();
+    saveState();
 });
 
 allTasks.addEventListener("click", () => {
     setFocusedButton(allTasks);
     currSection = 0;
     renderTasks();
+    saveState();
     closeSidebar();
 });
 
@@ -189,6 +258,7 @@ sectionList.addEventListener("click", (e) => {
             return section.name === sectionName;
         });
         renderTasks();
+        saveState();
         closeSidebar();
     }
 });
