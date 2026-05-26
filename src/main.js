@@ -62,15 +62,24 @@ function loadState() {
             sections.unshift(new Section("All"));
         }
 
+        let backfilledIds = false;
         tasks = Array.isArray(savedState.tasks)
-            ? savedState.tasks.map((task) => ({
-                ...task,
-                id: task.id ?? crypto.randomUUID(),
-            }))
+            ? savedState.tasks.map((task) => {
+                if (task.id) {
+                    return task;
+                }
+
+                backfilledIds = true;
+                return { ...task, id: crypto.randomUUID() };
+            })
             : [];
         currSection = Number.isInteger(savedState.currSection)
             ? savedState.currSection
             : 0;
+
+        if (backfilledIds) {
+            saveState();
+        }
     } catch {
         sections = [new Section("All")];
         tasks = [];
@@ -172,7 +181,6 @@ function resetTaskDialog() {
     taskDialogTitle.textContent = "Create new task";
     taskSubmit.textContent = "Create";
     taskForm.reset();
-    taskPriorityInput.value = "";
 }
 
 function openEditDialog(task) {
