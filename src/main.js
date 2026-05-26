@@ -13,6 +13,12 @@ const taskContainer = document.querySelector("#task-container");
 const allTasks = document.querySelector("#all-tasks");
 const sectionSubmit = document.querySelector("#section-submit");
 const taskSubmit = document.querySelector("#task-submit");
+const taskForm = document.querySelector("#task-form");
+const taskDialogTitle = document.querySelector("#task-dialog-title");
+const taskTitleInput = document.querySelector("#task-title");
+const taskDescriptionInput = document.querySelector("#task-description");
+const taskDueDateInput = document.querySelector("#task-due-date");
+const taskPriorityInput = document.querySelector("#task-priority");
 const sectionList = document.querySelector("#section-list");
 const STORAGE_KEY = "todo-list-state";
 
@@ -38,6 +44,7 @@ class Task {
 }
 
 let tasks = [];
+let editingTaskId = null;
 
 function loadState() {
     try {
@@ -110,14 +117,54 @@ function renderTasks(sectionIndex = currSection) {
 
         const taskElement = document.createElement("div");
         taskElement.classList.add("card");
+        taskElement.dataset.taskId = task.id;
         taskElement.innerHTML = `
-            <h3 class="text-xl font-bold">${task.title}</h3>
+            <div class="card-header">
+                <h3 class="text-xl font-bold">${task.title}</h3>
+                <div class="card-actions">
+                    <button
+                        type="button"
+                        class="icon-button"
+                        data-action="edit"
+                        aria-label="Edit task"
+                    >
+                        ✏️
+                    </button>
+                    <button
+                        type="button"
+                        class="icon-button"
+                        data-action="delete"
+                        aria-label="Delete task"
+                    >
+                        🗑️
+                    </button>
+                </div>
+            </div>
             <p>${task.description}</p>
             <p>Due: ${task.dueDate}</p>
         `;
         taskElement.classList.add(priorityColor(task.priority));
         taskContainer.appendChild(taskElement);
     });
+}
+
+function resetTaskDialog() {
+    editingTaskId = null;
+    taskDialogTitle.textContent = "Create new task";
+    taskSubmit.textContent = "Create";
+    taskForm.reset();
+    taskPriorityInput.value = "";
+}
+
+function openEditDialog(task) {
+    editingTaskId = task.id;
+    taskDialogTitle.textContent = "Edit task";
+    taskSubmit.textContent = "Save";
+    taskTitleInput.value = task.title ?? "";
+    taskDescriptionInput.value = task.description ?? "";
+    taskDueDateInput.value = task.dueDate ?? "";
+    taskPriorityInput.value = task.priority ?? "";
+    dialog1.showModal();
 }
 
 function setFocusedButton(button) {
@@ -163,10 +210,12 @@ sidebarClose.addEventListener("click", closeSidebar);
 sidebarBackdrop.addEventListener("click", closeSidebar);
 
 taskButton.addEventListener("click", () => {
+    resetTaskDialog();
     dialog1.showModal();
 });
 
 taskCancel.addEventListener("click", () => {
+    resetTaskDialog();
     dialog1.close();
 });
 
@@ -220,13 +269,28 @@ sectionRemoval.addEventListener("click", () => {
 
 taskSubmit.addEventListener("click", (e) => {
     e.preventDefault();
-    const title = document.querySelector("#task-title").value;
-    const description = document.querySelector("#task-description").value;
-    const dueDate = document.querySelector("#task-due-date").value;
-    const priority = document.querySelector("#task-priority").value;
-    const newTask = new Task(title, description, dueDate, priority);
-    tasks.push(newTask);
-    document.querySelector("#task-form").reset();
+    const title = taskTitleInput.value;
+    const description = taskDescriptionInput.value;
+    const dueDate = taskDueDateInput.value;
+    const priority = taskPriorityInput.value;
+
+    if (editingTaskId) {
+        const taskIndex = tasks.findIndex((task) => task.id === editingTaskId);
+        if (taskIndex !== -1) {
+            tasks[taskIndex] = {
+                ...tasks[taskIndex],
+                title,
+                description,
+                dueDate,
+                priority,
+            };
+        }
+    } else {
+        const newTask = new Task(title, description, dueDate, priority);
+        tasks.push(newTask);
+    }
+
+    resetTaskDialog();
     dialog1.close();
     renderTasks();
     saveState();
@@ -260,5 +324,34 @@ sectionList.addEventListener("click", (e) => {
         renderTasks();
         saveState();
         closeSidebar();
+    }
+});
+
+taskContainer.addEventListener("click", (event) => {
+    const actionButton = event.target.closest("button[data-action]");
+    if (!actionButton) {
+        return;
+    }
+
+    const taskCard = actionButton.closest(".card");
+    const taskId = taskCard?.dataset.taskId;
+    if (!taskId) {
+        return;
+    }
+
+    const task = tasks.find((entry) => entry.id === taskId);
+    if (!task) {
+        return;
+    }
+
+    if (actionButton.dataset.action === "edit") {
+        openEditDialog(task);
+        return;
+    }
+
+    if (actionButton.dataset.action === "delete") {
+        tasks = tasks.filter((entry) => entry.id !== taskId);
+        renderTasks();
+        saveState();
     }
 });
