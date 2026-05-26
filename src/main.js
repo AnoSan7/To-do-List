@@ -353,7 +353,7 @@ taskContainer.addEventListener("click", (event) => {
         return;
     }
 
-    const task = tasks.find((entry) => entry.id === taskId);
+    const task = tasks.find((entry) => String(entry.id) === taskId);
     if (!task) {
         return;
     }
@@ -364,7 +364,7 @@ taskContainer.addEventListener("click", (event) => {
     }
 
     if (actionButton.dataset.action === "delete") {
-        tasks = tasks.filter((entry) => entry.id !== taskId);
+        tasks = tasks.filter((entry) => String(entry.id) !== taskId);
         renderTasks();
         saveState();
     }
