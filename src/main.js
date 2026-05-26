@@ -117,7 +117,7 @@ function renderTasks(sectionIndex = currSection) {
 
         const taskElement = document.createElement("div");
         taskElement.classList.add("card");
-        taskElement.dataset.taskId = task.id;
+        taskElement.dataset.taskId = String(task.id);
         taskElement.setAttribute("role", "article");
         taskElement.setAttribute("aria-label", `Task ${task.title}`);
 
@@ -136,6 +136,7 @@ function renderTasks(sectionIndex = currSection) {
         editButton.classList.add("icon-button");
         editButton.dataset.action = "edit";
         editButton.setAttribute("aria-label", "Edit task");
+        editButton.title = "Edit task";
         editButton.textContent = "✏️";
 
         const deleteButton = document.createElement("button");
@@ -143,6 +144,7 @@ function renderTasks(sectionIndex = currSection) {
         deleteButton.classList.add("icon-button");
         deleteButton.dataset.action = "delete";
         deleteButton.setAttribute("aria-label", "Delete task");
+        deleteButton.title = "Delete task";
         deleteButton.textContent = "🗑️";
 
         actions.append(editButton, deleteButton);
