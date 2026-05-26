@@ -62,7 +62,12 @@ function loadState() {
             sections.unshift(new Section("All"));
         }
 
-        tasks = Array.isArray(savedState.tasks) ? savedState.tasks : [];
+        tasks = Array.isArray(savedState.tasks)
+            ? savedState.tasks.map((task) => ({
+                ...task,
+                id: task.id ?? crypto.randomUUID(),
+            }))
+            : [];
         currSection = Number.isInteger(savedState.currSection)
             ? savedState.currSection
             : 0;
