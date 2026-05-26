@@ -118,31 +118,43 @@ function renderTasks(sectionIndex = currSection) {
         const taskElement = document.createElement("div");
         taskElement.classList.add("card");
         taskElement.dataset.taskId = task.id;
-        taskElement.innerHTML = `
-            <div class="card-header">
-                <h3 class="text-xl font-bold">${task.title}</h3>
-                <div class="card-actions">
-                    <button
-                        type="button"
-                        class="icon-button"
-                        data-action="edit"
-                        aria-label="Edit task"
-                    >
-                        ✏️
-                    </button>
-                    <button
-                        type="button"
-                        class="icon-button"
-                        data-action="delete"
-                        aria-label="Delete task"
-                    >
-                        🗑️
-                    </button>
-                </div>
-            </div>
-            <p>${task.description}</p>
-            <p>Due: ${task.dueDate}</p>
-        `;
+        taskElement.setAttribute("role", "article");
+        taskElement.setAttribute("aria-label", `Task ${task.title}`);
+
+        const header = document.createElement("div");
+        header.classList.add("card-header");
+
+        const title = document.createElement("h3");
+        title.classList.add("text-xl", "font-bold");
+        title.textContent = task.title;
+
+        const actions = document.createElement("div");
+        actions.classList.add("card-actions");
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.classList.add("icon-button");
+        editButton.dataset.action = "edit";
+        editButton.setAttribute("aria-label", "Edit task");
+        editButton.textContent = "✏️";
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.classList.add("icon-button");
+        deleteButton.dataset.action = "delete";
+        deleteButton.setAttribute("aria-label", "Delete task");
+        deleteButton.textContent = "🗑️";
+
+        actions.append(editButton, deleteButton);
+        header.append(title, actions);
+
+        const description = document.createElement("p");
+        description.textContent = task.description;
+
+        const due = document.createElement("p");
+        due.textContent = `Due: ${task.dueDate}`;
+
+        taskElement.append(header, description, due);
         taskElement.classList.add(priorityColor(task.priority));
         taskContainer.appendChild(taskElement);
     });
@@ -160,10 +172,10 @@ function openEditDialog(task) {
     editingTaskId = task.id;
     taskDialogTitle.textContent = "Edit task";
     taskSubmit.textContent = "Save";
-    taskTitleInput.value = task.title ?? "";
-    taskDescriptionInput.value = task.description ?? "";
-    taskDueDateInput.value = task.dueDate ?? "";
-    taskPriorityInput.value = task.priority ?? "";
+    taskTitleInput.value = task.title;
+    taskDescriptionInput.value = task.description;
+    taskDueDateInput.value = task.dueDate;
+    taskPriorityInput.value = task.priority;
     dialog1.showModal();
 }
 
